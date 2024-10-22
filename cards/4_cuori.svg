@@ -1,0 +1,20 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+	<title>poker-cards-svgrepo-com-svg</title>
+	<defs>
+		<image width="512" height="512" id="img1" href="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj4KCTx0aXRsZT5wb2tlci1jYXJkcy1zdmdyZXBvLWNvbSAoMzYpLXN2ZzwvdGl0bGU+Cgk8c3R5bGU+CgkJLnMwIHsgZmlsbDogI2Q3MWUwMCB9IAoJPC9zdHlsZT4KCTxnPgoJCTxnPgoJCQk8cGF0aCBjbGFzcz0iczAiIGQ9Im0yNTYgMjM4LjNjOS41LTI0LjIgMjkuNi00NC4xIDU0LjktNDQuMSAyMS4yIDAgNDAuMiAxMCA1Mi45IDI2LjUgMTYuMSAyMC43IDI3LjQgNjYuNy03LjcgMTAxLjgtMTcuNyAxNy44LTEwMC4xIDEwMS4yLTEwMC4xIDEwMS4yIDAgMC04Mi40LTgzLjQtMTAwLjEtMTAxLjItMzUuMS0zNS4xLTIzLjgtODEuMS03LjctMTAxLjggMTIuNy0xNi41IDMxLjctMjYuNSA1Mi45LTI2LjUgMjUuMyAwIDQ1LjQgMTkuOSA1NC45IDQ0LjF6Ii8+CgkJPC9nPgoJPC9nPgo8L3N2Zz4="/>
+	</defs>
+	<style>
+		.s0 { fill: #e6eef4 } 
+		.s1 { fill: #d71e00 } 
+	</style>
+	<g>
+		<path class="s0" d="m423.7 0h-335.4c-9.8 0-17.7 7.9-17.7 17.7v476.6c0 9.8 7.9 17.7 17.7 17.7h335.4c9.8 0 17.7-7.9 17.7-17.7v-476.6c0-9.8-7.9-17.7-17.7-17.7z"/>
+		<g>
+			<path class="s1" d="m98.9 100.6c-3 3.9-2.2 9.5 1.7 12.4 3.9 2.9 9.5 2.1 12.4-1.8l53-70.6c2.9-3.9 2.1-9.4-1.8-12.4-3.9-2.9-9.4-2.1-12.4 1.8z"/>
+			<use id="heart" href="#img1" transform="matrix(1,0,0,1,0,0)"/>
+			<path class="s1" d="m150.1 141.2c0 4.9 3.9 8.9 8.8 8.9 4.9 0 8.8-4 8.8-8.9v-105.9c0-4.9-3.9-8.8-8.8-8.8-4.9 0-8.8 3.9-8.8 8.8z"/>
+			<path class="s1" d="m105.9 97.1c-4.8 0-8.8 4-8.8 8.8 0 4.9 4 8.9 8.8 8.9h70.7c4.8 0 8.8-4 8.8-8.9 0-4.8-4-8.8-8.8-8.8z"/>
+			<path class="s1" d="m176.6 150.1c4.8 0 8.8-4 8.8-8.9 0-4.8-4-8.8-8.8-8.8h-35.4c-4.8 0-8.8 4-8.8 8.8 0 4.9 4 8.9 8.8 8.9z"/>
+		</g>
+	</g>
+</svg>

@@ -1,0 +1,18 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+	<title>poker-cards-svgrepo-com (4)-svg</title>
+	<defs>
+		<image width="512" height="512" id="img1" href="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj4KCTx0aXRsZT5wb2tlci1jYXJkcy1zdmdyZXBvLWNvbSAoMzYpLXN2ZzwvdGl0bGU+Cgk8c3R5bGU+CgkJLnMwIHsgZmlsbDogI2Q3MWUwMCB9IAoJPC9zdHlsZT4KCTxnPgoJCTxnPgoJCQk8cGF0aCBjbGFzcz0iczAiIGQ9Im0yNTYgMjM4LjNjOS41LTI0LjIgMjkuNi00NC4xIDU0LjktNDQuMSAyMS4yIDAgNDAuMiAxMCA1Mi45IDI2LjUgMTYuMSAyMC43IDI3LjQgNjYuNy03LjcgMTAxLjgtMTcuNyAxNy44LTEwMC4xIDEwMS4yLTEwMC4xIDEwMS4yIDAgMC04Mi40LTgzLjQtMTAwLjEtMTAxLjItMzUuMS0zNS4xLTIzLjgtODEuMS03LjctMTAxLjggMTIuNy0xNi41IDMxLjctMjYuNSA1Mi45LTI2LjUgMjUuMyAwIDQ1LjQgMTkuOSA1NC45IDQ0LjF6Ii8+CgkJPC9nPgoJPC9nPgo8L3N2Zz4="/>
+	</defs>
+	<style>
+		.s0 { fill: #e6eef4 } 
+		.s1 { fill: #d71e00 } 
+	</style>
+	<g>
+		<path class="s0" d="m423.7 0h-335.4c-9.8 0-17.7 7.9-17.7 17.7v476.6c0 9.8 7.9 17.7 17.7 17.7h335.4c9.8 0 17.7-7.9 17.7-17.7v-476.6c0-9.8-7.9-17.7-17.7-17.7z"/>
+		<g>
+			<path class="s1" d="m123.6 97.1c19.5 0 35.3-15.8 35.3-35.3 0-19.5-15.8-35.3-35.3-35.3-4.1 0-8 0.7-11.8 2-5.2 1.8-9.8 5-14.2 9.4-3.4 3.4-3.4 9 0 12.5 3.5 3.4 9 3.4 12.5 0 2.6-2.7 5.1-4.4 7.6-5.3q2.8-1 5.9-1c9.7 0 17.6 7.9 17.6 17.7 0 9.7-7.9 17.6-17.6 17.6h-8.8c-4.9 0-8.8 4-8.8 8.9 0 4.9 3.9 8.8 8.8 8.8 0 0 8.8 0 8.8 0z"/>
+			<use id="heart" href="#img1" transform="matrix(1,0,0,1,0,0)"/>
+			<path class="s1" d="m123.6 150.1c19.5 0 35.3-15.8 35.3-35.3 0-19.5-15.8-35.4-35.3-35.4h-8.8c-4.9 0-8.9 4-8.9 8.9 0 4.9 4 8.8 8.9 8.8h8.8c9.7 0 17.6 7.9 17.6 17.7 0 9.7-7.9 17.6-17.6 17.6-4.8 0-9.5-2.2-13.5-6.2-3.4-3.4-9-3.4-12.5 0-3.4 3.5-3.4 9 0 12.5 7.2 7.1 16.2 11.4 26 11.4z"/>
+		</g>
+	</g>
+</svg>

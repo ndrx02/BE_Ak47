@@ -1,0 +1,16 @@
+{
+  "name": "be_ak47",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --watch index.js"
+  },
+  "author": "Andrei",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "type": "module"
+}
