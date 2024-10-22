@@ -54,6 +54,7 @@ wss.on("connection", (ws) => {
             name: dataReceived.player,
             avatar: ``,
             hand: { cards: [], cardsName: [] },
+            points: 0,
             client: ws,
           };
           const room = {
@@ -63,6 +64,7 @@ wss.on("connection", (ws) => {
             deck: [],
             usedCards: [],
             inStockCards: [],
+            round: 0,
           };
 
           rooms.push(room);
@@ -79,16 +81,28 @@ wss.on("connection", (ws) => {
             name: dataReceived.player,
             avatar: ``,
             hand: { cards: [], cardsName: [] },
+            points: 0,
             client: ws,
           };
 
-          const room = rooms.find((room) => room.token === dataReceived.token);
+          const roomToJoin = rooms.find(
+            (room) => room.token === dataReceived.token
+          );
 
-          if (room) {
-            room.players.push(player);
+          if (roomToJoin) {
+            roomToJoin.players.push(player);
           }
 
-          ws.send(JSON.stringify({ players: room.players }));
+          wss.clients.forEach((client) => {
+            client.send(
+              JSON.stringify({
+                players: {
+                  name: player.name,
+                  avatar: player.avatar,
+                },
+              })
+            );
+          });
         } catch (err) {
           console.error(err);
         }
@@ -159,7 +173,14 @@ wss.on("connection", (ws) => {
       }
       case "THROW A CARD": {
         try {
-          if (room.players[indexOfPlayer].hand.cardsName.length === 4) {
+          if (room.round >= room.players.length) {
+            room.round = 0;
+          }
+
+          if (
+            room.players[indexOfPlayer].hand.cardsName.length === 4 &&
+            room.round === indexOfPlayer
+          ) {
             room.players[indexOfPlayer].hand.cards.splice(
               dataReceived.cardIndex,
               1
@@ -170,6 +191,8 @@ wss.on("connection", (ws) => {
             );
 
             room.usedCards.push(dataReceived.card);
+
+            room.round++;
 
             ws.send(
               JSON.stringify({
@@ -187,12 +210,12 @@ wss.on("connection", (ws) => {
       }
       case "DRAW FROM DECK": {
         try {
-          const c = await cardToBase64(room.deck[room.deck.length - 1]);
-
           if (
             room.players[indexOfPlayer].hand.cards.length < 4 &&
             room.deck.length > 0
           ) {
+            const c = await cardToBase64(room.deck[room.deck.length - 1]);
+
             room.players[indexOfPlayer].hand.cards.push(c);
             room.players[indexOfPlayer].hand.cardsName.push(
               room.deck[room.deck.length - 1]
@@ -217,7 +240,14 @@ wss.on("connection", (ws) => {
       }
       case "SAVE IN STOCK": {
         try {
-          if (room.players[indexOfPlayer].hand.cardsName.length === 4) {
+          if (room.round >= room.players.length) {
+            room.round = 0;
+          }
+
+          if (
+            room.players[indexOfPlayer].hand.cardsName.length === 4 &&
+            room.round === indexOfPlayer
+          ) {
             if (
               dataReceived.card.startsWith("re_") ||
               dataReceived.card.startsWith("asso") ||
@@ -236,6 +266,8 @@ wss.on("connection", (ws) => {
 
               room.inStockCards.push(dataReceived.card);
 
+              room.round++;
+
               ws.send(
                 JSON.stringify({
                   cards: room.players[indexOfPlayer].hand.cards,
@@ -246,8 +278,6 @@ wss.on("connection", (ws) => {
           } else {
             throw new Error("the player has already played");
           }
-
-          console.log(room.inStockCards);
         } catch (err) {
           console.error(err);
         }
@@ -255,14 +285,14 @@ wss.on("connection", (ws) => {
       }
       case "DRAW FROM STOCK": {
         try {
-          const c = await cardToBase64(
-            room.inStockCards[room.inStockCards.length - 1]
-          );
-
           if (
             room.players[indexOfPlayer].hand.cards.length < 4 &&
             room.inStockCards.length > 0
           ) {
+            const c = await cardToBase64(
+              room.inStockCards[room.inStockCards.length - 1]
+            );
+
             room.players[indexOfPlayer].hand.cards.push(c);
             room.players[indexOfPlayer].hand.cardsName.push(
               room.inStockCards[room.inStockCards.length - 1]
@@ -287,6 +317,96 @@ wss.on("connection", (ws) => {
         break;
       }
       case "FIRE": {
+        try {
+          if (room.round >= room.players.length) {
+            room.round = 0;
+          }
+
+          const ak47 = dataReceived.hand.filter(
+            (card) =>
+              card.startsWith("re") ||
+              card.startsWith("asso") ||
+              card.startsWith("4") ||
+              card.startsWith("7") ||
+              card.startsWith("jolly")
+          );
+
+          if (ak47.length === 4 && room.round === indexOfPlayer) {
+            const seeds = {
+              cuori: [],
+              picche: [],
+              fiori: [],
+              quadri: [],
+            };
+
+            for (let index = 0; index < ak47.length; index++) {
+              const seedExtract = ak47[index].split("_")[1];
+              switch (seedExtract) {
+                case "cuori": {
+                  seeds.cuori.push(seedExtract);
+                  break;
+                }
+                case "picche": {
+                  seeds.picche.push(seedExtract);
+                  break;
+                }
+                case "fiori": {
+                  seeds.fiori.push(seedExtract);
+                  break;
+                }
+                case "quadri": {
+                  seeds.quadri.push(seedExtract);
+                  break;
+                }
+                case "rosso": {
+                  seeds.cuori.push(seedExtract);
+                  seeds.quadri.push(seedExtract);
+                  break;
+                }
+                case "nero": {
+                  seeds.picche.push(seedExtract);
+                  seeds.fiori.push(seedExtract);
+                  break;
+                }
+              }
+            }
+            if (
+              seeds.fiori.length === 4 ||
+              seeds.cuori.length === 4 ||
+              seeds.quadri.length === 4 ||
+              seeds.picche.length === 4
+            ) {
+              const dado = Math.floor(Math.random() * 6);
+              room.players[indexOfPlayer].points += dado * 2;
+
+              console.log(room.players[indexOfPlayer].points);
+            } else {
+              const dado = Math.floor(Math.random() * 6);
+              room.players[indexOfPlayer].points += dado;
+            }
+
+            room.round++;
+
+            wss.clients.forEach((client) => {
+              const player = room.players[indexOfPlayer];
+
+              client.send(
+                JSON.stringify({
+                  players: {
+                    name: player.name,
+                    avatar: player.avatar,
+                    points: player.points,
+                  },
+                })
+              );
+            });
+          } else {
+            throw new Error("the player has already played");
+          }
+        } catch (err) {
+          console.error(err);
+        }
+        break;
       }
       case "END": {
       }
