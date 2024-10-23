@@ -24,12 +24,6 @@ const cardToBase64 = async (card) => {
 wss.on("connection", (ws) => {
   ws.on("error", console.error);
 
-  // wss.clients.forEach((client) => {
-  //   if (client.readyState === WebSocket.OPEN && client === ws) {
-  //     client.send("Benvenuto!");
-  //   }
-  // });
-
   ws.on("message", async (msg) => {
     const dataReceived = JSON.parse(msg.toString());
     let room;
@@ -54,8 +48,9 @@ wss.on("connection", (ws) => {
             name: dataReceived.player,
             avatar: ``,
             hand: { cards: [], cardsName: [] },
-            points: 0,
+            points: 20,
             client: ws,
+            canPlay: true,
           };
           const room = {
             id: rooms.length + 1,
@@ -65,6 +60,7 @@ wss.on("connection", (ws) => {
             usedCards: [],
             inStockCards: [],
             round: 0,
+            iStarted: false,
           };
 
           rooms.push(room);
@@ -81,16 +77,23 @@ wss.on("connection", (ws) => {
             name: dataReceived.player,
             avatar: ``,
             hand: { cards: [], cardsName: [] },
-            points: 0,
+            points: 20,
             client: ws,
+            canPlay: true,
           };
 
           const roomToJoin = rooms.find(
             (room) => room.token === dataReceived.token
           );
 
-          if (roomToJoin) {
+          if (
+            roomToJoin &&
+            roomToJoin.players.length < 6 &&
+            roomToJoin.iStarted === false
+          ) {
             roomToJoin.players.push(player);
+          } else {
+            throw new Error("already 6 players or game is already started");
           }
 
           wss.clients.forEach((client) => {
@@ -130,41 +133,47 @@ wss.on("connection", (ws) => {
         try {
           const deck = [...files, ...files];
 
-          //distribuzione carte ai giocatori
-          for (let iPlayer = 0; iPlayer < room.players.length; iPlayer++) {
-            for (let iCard = 0; iCard < 4; iCard++) {
+          if (indexOfPlayer === 0 && room.iStarted === false) {
+            room.iStarted = true;
+
+            //distribuzione carte ai giocatori
+            for (let iPlayer = 0; iPlayer < room.players.length; iPlayer++) {
+              for (let iCard = 0; iCard < 4; iCard++) {
+                const randomCard = Math.floor(Math.random() * deck.length);
+                const cardIndex = deck.indexOf(deck[randomCard]);
+
+                const c = await cardToBase64(deck[randomCard]);
+
+                room.players[iPlayer].hand.cards.push(c);
+                room.players[iPlayer].hand.cardsName.push(deck[randomCard]);
+                deck.splice(deck[cardIndex], 1);
+              }
+
+              wss.clients.forEach((client) => {
+                if (
+                  client.readyState === WebSocket.OPEN &&
+                  client === room.players[iPlayer].client
+                ) {
+                  client.send(
+                    JSON.stringify({
+                      cards: room.players[iPlayer].hand.cards,
+                      cardsName: room.players[iPlayer].hand.cardsName,
+                    })
+                  );
+                }
+              });
+            }
+
+            //mix del mazzo
+            for (let index = 0; index < deck.length; index++) {
               const randomCard = Math.floor(Math.random() * deck.length);
               const cardIndex = deck.indexOf(deck[randomCard]);
 
-              const c = await cardToBase64(deck[randomCard]);
-
-              room.players[iPlayer].hand.cards.push(c);
-              room.players[iPlayer].hand.cardsName.push(deck[randomCard]);
               deck.splice(deck[cardIndex], 1);
+              room.deck.push(deck[randomCard]);
             }
-
-            wss.clients.forEach((client) => {
-              if (
-                client.readyState === WebSocket.OPEN &&
-                client === room.players[iPlayer].client
-              ) {
-                client.send(
-                  JSON.stringify({
-                    cards: room.players[iPlayer].hand.cards,
-                    cardsName: room.players[iPlayer].hand.cardsName,
-                  })
-                );
-              }
-            });
-          }
-
-          //mix del mazzo
-          for (let index = 0; index < deck.length; index++) {
-            const randomCard = Math.floor(Math.random() * deck.length);
-            const cardIndex = deck.indexOf(deck[randomCard]);
-
-            deck.splice(deck[cardIndex], 1);
-            room.deck.push(deck[randomCard]);
+          } else {
+            throw new Error("only the creator can start");
           }
         } catch (err) {
           console.error(err);
@@ -179,7 +188,8 @@ wss.on("connection", (ws) => {
 
           if (
             room.players[indexOfPlayer].hand.cardsName.length === 4 &&
-            room.round === indexOfPlayer
+            room.round === indexOfPlayer &&
+            room.players[indexOfPlayer].canPlay === true
           ) {
             room.players[indexOfPlayer].hand.cards.splice(
               dataReceived.cardIndex,
@@ -200,6 +210,12 @@ wss.on("connection", (ws) => {
                 cardsName: room.players[indexOfPlayer].hand.cardsName,
               })
             );
+
+            wss.clients.forEach(() => {
+              JSON.stringify({
+                usedCard: room.usedCards[room.usedCards.length - 1],
+              });
+            });
           } else {
             throw new Error("the player has already played");
           }
@@ -212,7 +228,8 @@ wss.on("connection", (ws) => {
         try {
           if (
             room.players[indexOfPlayer].hand.cards.length < 4 &&
-            room.deck.length > 0
+            room.deck.length > 0 &&
+            room.players[indexOfPlayer].canPlay === true
           ) {
             const c = await cardToBase64(room.deck[room.deck.length - 1]);
 
@@ -246,7 +263,8 @@ wss.on("connection", (ws) => {
 
           if (
             room.players[indexOfPlayer].hand.cardsName.length === 4 &&
-            room.round === indexOfPlayer
+            room.round === indexOfPlayer &&
+            room.players[indexOfPlayer].canPlay === true
           ) {
             if (
               dataReceived.card.startsWith("re_") ||
@@ -287,7 +305,8 @@ wss.on("connection", (ws) => {
         try {
           if (
             room.players[indexOfPlayer].hand.cards.length < 4 &&
-            room.inStockCards.length > 0
+            room.inStockCards.length > 0 &&
+            room.players[indexOfPlayer].canPlay === true
           ) {
             const c = await cardToBase64(
               room.inStockCards[room.inStockCards.length - 1]
@@ -370,25 +389,31 @@ wss.on("connection", (ws) => {
                 }
               }
             }
+
+            const dado = Math.floor(Math.random() * 6 + 1);
+            const extractSelf = room.players.filter(
+              (p) => p !== room.players[indexOfPlayer]
+            );
+            const playerToShoot = Math.floor(
+              Math.random() * extractSelf.length
+            );
+            const findPlayer = room.players.indexOf(extractSelf[playerToShoot]);
+
             if (
               seeds.fiori.length === 4 ||
               seeds.cuori.length === 4 ||
               seeds.quadri.length === 4 ||
               seeds.picche.length === 4
             ) {
-              const dado = Math.floor(Math.random() * 6);
-              room.players[indexOfPlayer].points += dado * 2;
-
-              console.log(room.players[indexOfPlayer].points);
+              room.players[findPlayer].points -= dado * 2;
             } else {
-              const dado = Math.floor(Math.random() * 6);
-              room.players[indexOfPlayer].points += dado;
+              room.players[findPlayer].points -= dado;
             }
 
             room.round++;
 
             wss.clients.forEach((client) => {
-              const player = room.players[indexOfPlayer];
+              const player = room.players[findPlayer];
 
               client.send(
                 JSON.stringify({
@@ -400,8 +425,30 @@ wss.on("connection", (ws) => {
                 })
               );
             });
+
+            if (room.players[findPlayer].points <= 0) {
+              room.players[findPlayer].canPlay = false;
+              room.players[findPlayer].hand.cards = [];
+              room.players[findPlayer].hand.cardsName = [];
+
+              wss.clients.forEach((client) => {
+                const player = room.players[findPlayer];
+
+                client.send(
+                  JSON.stringify({
+                    players: {
+                      name: player.name,
+                      avatar: player.avatar,
+                      points: player.points,
+                    },
+                  })
+                );
+              });
+            }
           } else {
-            throw new Error("the player has already played");
+            throw new Error(
+              "the player has already played or is not his round"
+            );
           }
         } catch (err) {
           console.error(err);
@@ -409,6 +456,24 @@ wss.on("connection", (ws) => {
         break;
       }
       case "END": {
+        try {
+          if (indexOfPlayer === 0 && room.iStarted === true) {
+            const findRoom = rooms.indexOf(room);
+
+            rooms.splice(findRoom, 1);
+
+            wss.clients.forEach((client) => {
+              client.terminate();
+            });
+          } else {
+            throw new Error(
+              "the game is not started or you are not the creator"
+            );
+          }
+        } catch (err) {
+          console.log(err);
+        }
+        break;
       }
       default: {
         console.log(msg.toString());
